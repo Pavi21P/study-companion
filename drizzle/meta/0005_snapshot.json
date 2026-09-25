@@ -1,0 +1,1620 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "e71d0d23-519b-444d-9711-4d9b4a957833",
+  "prevId": "543fd86e-59d8-4634-9656-7e7deb6fbe36",
+  "tables": {
+    "authored_questions": {
+      "name": "authored_questions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "quiz_id": {
+          "name": "quiz_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "position": {
+          "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "prompt": {
+          "name": "prompt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
+        },
+        "choices": {
+          "name": "choices",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[\"\",\"\"]'"
+        },
+        "correct_index": {
+          "name": "correct_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "explanation": {
+          "name": "explanation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
+        }
+      },
+      "indexes": {
+        "uq_authored_questions_quiz_position": {
+          "name": "uq_authored_questions_quiz_position",
+          "columns": [
+            "quiz_id",
+            "position"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "authored_questions_quiz_id_authored_quizzes_id_fk": {
+          "name": "authored_questions_quiz_id_authored_quizzes_id_fk",
+          "tableFrom": "authored_questions",
+          "tableTo": "authored_quizzes",
+          "columnsFrom": [
+            "quiz_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "authored_question_position": {
+          "name": "authored_question_position",
+          "value": "typeof(\"authored_questions\".\"position\") = 'integer' AND \"authored_questions\".\"position\" BETWEEN 0 AND 499"
+        },
+        "authored_question_prompt": {
+          "name": "authored_question_prompt",
+          "value": "length(\"authored_questions\".\"prompt\") <= 4000"
+        },
+        "authored_question_explanation": {
+          "name": "authored_question_explanation",
+          "value": "length(\"authored_questions\".\"explanation\") <= 4000"
+        },
+        "authored_question_choices_json": {
+          "name": "authored_question_choices_json",
+          "value": "json_valid(\"authored_questions\".\"choices\")"
+        },
+        "authored_question_choices_array": {
+          "name": "authored_question_choices_array",
+          "value": "json_type(\"authored_questions\".\"choices\") = 'array' AND json_array_length(\"authored_questions\".\"choices\") BETWEEN 2 AND 6"
+        },
+        "authored_question_correct_index": {
+          "name": "authored_question_correct_index",
+          "value": "\"authored_questions\".\"correct_index\" IS NULL OR (typeof(\"authored_questions\".\"correct_index\") = 'integer' AND \"authored_questions\".\"correct_index\" >= 0 AND \"authored_questions\".\"correct_index\" < json_array_length(\"authored_questions\".\"choices\"))"
+        }
+      }
+    },
+    "authored_quizzes": {
+      "name": "authored_quizzes",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'Untitled quiz'"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
+        },
+        "revision": {
+          "name": "revision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch())"
+        }
+      },
+      "indexes": {
+        "idx_authored_quizzes_owner_updated": {
+          "name": "idx_authored_quizzes_owner_updated",
+          "columns": [
+            "owner_id",
+            "updated_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "authored_quizzes_owner_id_users_id_fk": {
+          "name": "authored_quizzes_owner_id_users_id_fk",
+          "tableFrom": "authored_quizzes",
+          "tableTo": "users",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "authored_quiz_title": {
+          "name": "authored_quiz_title",
+          "value": "length(trim(\"authored_quizzes\".\"title\")) BETWEEN 1 AND 120"
+        },
+        "authored_quiz_description": {
+          "name": "authored_quiz_description",
+          "value": "length(\"authored_quizzes\".\"description\") <= 1000"
+        },
+        "authored_quiz_revision": {
+          "name": "authored_quiz_revision",
+          "value": "typeof(\"authored_quizzes\".\"revision\") = 'integer' AND \"authored_quizzes\".\"revision\" >= 1"
+        }
+      }
+    },
+    "courses": {
+      "name": "courses",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch())"
+        }
+      },
+      "indexes": {
+        "idx_courses_owner_created": {
+          "name": "idx_courses_owner_created",
+          "columns": [
+            "owner_id",
+            "created_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "courses_owner_id_users_id_fk": {
+          "name": "courses_owner_id_users_id_fk",
+          "tableFrom": "courses",
+          "tableTo": "users",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "courses_title_length": {
+          "name": "courses_title_length",
+          "value": "length(trim(\"courses\".\"title\")) BETWEEN 1 AND 120"
+        },
+        "courses_description_length": {
+          "name": "courses_description_length",
+          "value": "length(\"courses\".\"description\") <= 1000"
+        }
+      }
+    },
+    "flashcards": {
+      "name": "flashcards",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "study_set_id": {
+          "name": "study_set_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source_id": {
+          "name": "source_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "passage_id": {
+          "name": "passage_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "position": {
+          "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "front": {
+          "name": "front",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "back": {
+          "name": "back",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "uq_flashcards_set_position": {
+          "name": "uq_flashcards_set_position",
+          "columns": [
+            "study_set_id",
+            "position"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "flashcards_study_set_id_source_id_study_sets_id_source_id_fk": {
+          "name": "flashcards_study_set_id_source_id_study_sets_id_source_id_fk",
+          "tableFrom": "flashcards",
+          "tableTo": "study_sets",
+          "columnsFrom": [
+            "study_set_id",
+            "source_id"
+          ],
+          "columnsTo": [
+            "id",
+            "source_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "flashcards_passage_id_source_id_passages_id_source_id_fk": {
+          "name": "flashcards_passage_id_source_id_passages_id_source_id_fk",
+          "tableFrom": "flashcards",
+          "tableTo": "passages",
+          "columnsFrom": [
+            "passage_id",
+            "source_id"
+          ],
+          "columnsTo": [
+            "id",
+            "source_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "flashcards_position": {
+          "name": "flashcards_position",
+          "value": "\"flashcards\".\"position\" >= 0"
+        },
+        "flashcards_text": {
+          "name": "flashcards_text",
+          "value": "length(trim(\"flashcards\".\"front\")) > 0 AND length(trim(\"flashcards\".\"back\")) > 0"
+        }
+      }
+    },
+    "folders": {
+      "name": "folders",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch())"
+        }
+      },
+      "indexes": {
+        "uq_folders_id_owner": {
+          "name": "uq_folders_id_owner",
+          "columns": [
+            "id",
+            "owner_id"
+          ],
+          "isUnique": true
+        },
+        "idx_folders_owner_parent_name": {
+          "name": "idx_folders_owner_parent_name",
+          "columns": [
+            "owner_id",
+            "parent_id",
+            "name",
+            "id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "folders_owner_id_users_id_fk": {
+          "name": "folders_owner_id_users_id_fk",
+          "tableFrom": "folders",
+          "tableTo": "users",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "folders_parent_id_owner_id_folders_id_owner_id_fk": {
+          "name": "folders_parent_id_owner_id_folders_id_owner_id_fk",
+          "tableFrom": "folders",
+          "tableTo": "folders",
+          "columnsFrom": [
+            "parent_id",
+            "owner_id"
+          ],
+          "columnsTo": [
+            "id",
+            "owner_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "folder_name": {
+          "name": "folder_name",
+          "value": "length(trim(\"folders\".\"name\")) BETWEEN 1 AND 120"
+        },
+        "folder_not_self": {
+          "name": "folder_not_self",
+          "value": "\"folders\".\"parent_id\" IS NULL OR \"folders\".\"parent_id\" <> \"folders\".\"id\""
+        }
+      }
+    },
+    "guest_attempts": {
+      "name": "guest_attempts",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "share_id": {
+          "name": "share_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "version_id": {
+          "name": "version_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "answers_json": {
+          "name": "answers_json",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "score": {
+          "name": "score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "question_count": {
+          "name": "question_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch())"
+        }
+      },
+      "indexes": {
+        "idx_guest_attempts_share": {
+          "name": "idx_guest_attempts_share",
+          "columns": [
+            "share_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "guest_attempts_share_id_version_id_quiz_shares_id_version_id_fk": {
+          "name": "guest_attempts_share_id_version_id_quiz_shares_id_version_id_fk",
+          "tableFrom": "guest_attempts",
+          "tableTo": "quiz_shares",
+          "columnsFrom": [
+            "share_id",
+            "version_id"
+          ],
+          "columnsTo": [
+            "id",
+            "version_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "guest_attempt_id": {
+          "name": "guest_attempt_id",
+          "value": "length(\"guest_attempts\".\"id\") = 64"
+        },
+        "guest_attempt_count": {
+          "name": "guest_attempt_count",
+          "value": "\"guest_attempts\".\"question_count\" BETWEEN 1 AND 500"
+        },
+        "guest_attempt_score": {
+          "name": "guest_attempt_score",
+          "value": "\"guest_attempts\".\"score\" BETWEEN 0 AND \"guest_attempts\".\"question_count\""
+        },
+        "guest_attempt_answers": {
+          "name": "guest_attempt_answers",
+          "value": "json_valid(\"guest_attempts\".\"answers_json\") AND json_type(\"guest_attempts\".\"answers_json\") = 'array' AND json_array_length(\"guest_attempts\".\"answers_json\") = \"guest_attempts\".\"question_count\""
+        }
+      }
+    },
+    "passages": {
+      "name": "passages",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source_id": {
+          "name": "source_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "position": {
+          "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "location": {
+          "name": "location",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "heading": {
+          "name": "heading",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "uq_passages_source_position": {
+          "name": "uq_passages_source_position",
+          "columns": [
+            "source_id",
+            "position"
+          ],
+          "isUnique": true
+        },
+        "uq_passages_id_source": {
+          "name": "uq_passages_id_source",
+          "columns": [
+            "id",
+            "source_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "passages_source_id_sources_id_fk": {
+          "name": "passages_source_id_sources_id_fk",
+          "tableFrom": "passages",
+          "tableTo": "sources",
+          "columnsFrom": [
+            "source_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "passages_position": {
+          "name": "passages_position",
+          "value": "\"passages\".\"position\" >= 0"
+        },
+        "passages_location": {
+          "name": "passages_location",
+          "value": "\"passages\".\"location\" BETWEEN 1 AND 100"
+        },
+        "passages_content": {
+          "name": "passages_content",
+          "value": "length(trim(\"passages\".\"content\")) > 0"
+        }
+      }
+    },
+    "question_passages": {
+      "name": "question_passages",
+      "columns": {
+        "question_id": {
+          "name": "question_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "passage_id": {
+          "name": "passage_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source_id": {
+          "name": "source_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "uq_question_passages_pair": {
+          "name": "uq_question_passages_pair",
+          "columns": [
+            "question_id",
+            "passage_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "question_passages_question_id_source_id_questions_id_source_id_fk": {
+          "name": "question_passages_question_id_source_id_questions_id_source_id_fk",
+          "tableFrom": "question_passages",
+          "tableTo": "questions",
+          "columnsFrom": [
+            "question_id",
+            "source_id"
+          ],
+          "columnsTo": [
+            "id",
+            "source_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "question_passages_passage_id_source_id_passages_id_source_id_fk": {
+          "name": "question_passages_passage_id_source_id_passages_id_source_id_fk",
+          "tableFrom": "question_passages",
+          "tableTo": "passages",
+          "columnsFrom": [
+            "passage_id",
+            "source_id"
+          ],
+          "columnsTo": [
+            "id",
+            "source_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "questions": {
+      "name": "questions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "study_set_id": {
+          "name": "study_set_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source_id": {
+          "name": "source_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "position": {
+          "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "prompt": {
+          "name": "prompt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "options": {
+          "name": "options",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "correct_index": {
+          "name": "correct_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "uq_questions_set_position": {
+          "name": "uq_questions_set_position",
+          "columns": [
+            "study_set_id",
+            "position"
+          ],
+          "isUnique": true
+        },
+        "uq_questions_id_set": {
+          "name": "uq_questions_id_set",
+          "columns": [
+            "id",
+            "study_set_id"
+          ],
+          "isUnique": true
+        },
+        "uq_questions_id_source": {
+          "name": "uq_questions_id_source",
+          "columns": [
+            "id",
+            "source_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "questions_study_set_id_source_id_study_sets_id_source_id_fk": {
+          "name": "questions_study_set_id_source_id_study_sets_id_source_id_fk",
+          "tableFrom": "questions",
+          "tableTo": "study_sets",
+          "columnsFrom": [
+            "study_set_id",
+            "source_id"
+          ],
+          "columnsTo": [
+            "id",
+            "source_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "questions_position": {
+          "name": "questions_position",
+          "value": "\"questions\".\"position\" >= 0"
+        },
+        "questions_prompt": {
+          "name": "questions_prompt",
+          "value": "length(trim(\"questions\".\"prompt\")) > 0"
+        },
+        "questions_options_json": {
+          "name": "questions_options_json",
+          "value": "json_valid(\"questions\".\"options\")"
+        },
+        "questions_options_array": {
+          "name": "questions_options_array",
+          "value": "json_type(\"questions\".\"options\") = 'array' AND json_array_length(\"questions\".\"options\") BETWEEN 2 AND 6"
+        },
+        "questions_correct_index": {
+          "name": "questions_correct_index",
+          "value": "\"questions\".\"correct_index\" >= 0 AND \"questions\".\"correct_index\" < json_array_length(\"questions\".\"options\")"
+        }
+      }
+    },
+    "quiz_attempts": {
+      "name": "quiz_attempts",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "study_set_id": {
+          "name": "study_set_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "question_count": {
+          "name": "question_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "score": {
+          "name": "score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch())"
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "idx_attempts_user_created": {
+          "name": "idx_attempts_user_created",
+          "columns": [
+            "user_id",
+            "created_at"
+          ],
+          "isUnique": false
+        },
+        "idx_attempts_set": {
+          "name": "idx_attempts_set",
+          "columns": [
+            "study_set_id"
+          ],
+          "isUnique": false
+        },
+        "uq_attempts_id_set": {
+          "name": "uq_attempts_id_set",
+          "columns": [
+            "id",
+            "study_set_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "quiz_attempts_study_set_id_study_sets_id_fk": {
+          "name": "quiz_attempts_study_set_id_study_sets_id_fk",
+          "tableFrom": "quiz_attempts",
+          "tableTo": "study_sets",
+          "columnsFrom": [
+            "study_set_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "quiz_attempts_user_id_users_id_fk": {
+          "name": "quiz_attempts_user_id_users_id_fk",
+          "tableFrom": "quiz_attempts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "attempts_question_count": {
+          "name": "attempts_question_count",
+          "value": "\"quiz_attempts\".\"question_count\" > 0"
+        },
+        "attempts_score": {
+          "name": "attempts_score",
+          "value": "\"quiz_attempts\".\"score\" IS NULL OR \"quiz_attempts\".\"score\" BETWEEN 0 AND \"quiz_attempts\".\"question_count\""
+        },
+        "attempts_completion": {
+          "name": "attempts_completion",
+          "value": "(\"quiz_attempts\".\"completed_at\" IS NULL AND \"quiz_attempts\".\"score\" IS NULL) OR (\"quiz_attempts\".\"completed_at\" IS NOT NULL AND \"quiz_attempts\".\"score\" IS NOT NULL AND \"quiz_attempts\".\"completed_at\" >= \"quiz_attempts\".\"created_at\")"
+        }
+      }
+    },
+    "quiz_shares": {
+      "name": "quiz_shares",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "version_id": {
+          "name": "version_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch())"
+        },
+        "revoked_at": {
+          "name": "revoked_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "uq_quiz_shares_active_version": {
+          "name": "uq_quiz_shares_active_version",
+          "columns": [
+            "version_id"
+          ],
+          "isUnique": true,
+          "where": "\"quiz_shares\".\"revoked_at\" IS NULL"
+        },
+        "idx_quiz_shares_version": {
+          "name": "idx_quiz_shares_version",
+          "columns": [
+            "version_id"
+          ],
+          "isUnique": false
+        },
+        "uq_quiz_shares_id_version": {
+          "name": "uq_quiz_shares_id_version",
+          "columns": [
+            "id",
+            "version_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "quiz_shares_version_id_quiz_versions_id_fk": {
+          "name": "quiz_shares_version_id_quiz_versions_id_fk",
+          "tableFrom": "quiz_shares",
+          "tableTo": "quiz_versions",
+          "columnsFrom": [
+            "version_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "quiz_share_token_length": {
+          "name": "quiz_share_token_length",
+          "value": "length(\"quiz_shares\".\"id\") = 64"
+        },
+        "quiz_share_revocation": {
+          "name": "quiz_share_revocation",
+          "value": "\"quiz_shares\".\"revoked_at\" IS NULL OR \"quiz_shares\".\"revoked_at\" >= \"quiz_shares\".\"created_at\""
+        }
+      }
+    },
+    "quiz_versions": {
+      "name": "quiz_versions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "quiz_id": {
+          "name": "quiz_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "draft_revision": {
+          "name": "draft_revision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "questions_json": {
+          "name": "questions_json",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch())"
+        }
+      },
+      "indexes": {
+        "uq_quiz_versions_quiz_revision": {
+          "name": "uq_quiz_versions_quiz_revision",
+          "columns": [
+            "quiz_id",
+            "draft_revision"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "quiz_versions_quiz_id_authored_quizzes_id_fk": {
+          "name": "quiz_versions_quiz_id_authored_quizzes_id_fk",
+          "tableFrom": "quiz_versions",
+          "tableTo": "authored_quizzes",
+          "columnsFrom": [
+            "quiz_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "quiz_version_revision": {
+          "name": "quiz_version_revision",
+          "value": "typeof(\"quiz_versions\".\"draft_revision\") = 'integer' AND \"quiz_versions\".\"draft_revision\" >= 1"
+        },
+        "quiz_version_title": {
+          "name": "quiz_version_title",
+          "value": "length(trim(\"quiz_versions\".\"title\")) BETWEEN 1 AND 120"
+        },
+        "quiz_version_description": {
+          "name": "quiz_version_description",
+          "value": "length(\"quiz_versions\".\"description\") <= 1000"
+        },
+        "quiz_version_questions_json": {
+          "name": "quiz_version_questions_json",
+          "value": "json_valid(\"quiz_versions\".\"questions_json\")"
+        },
+        "quiz_version_question_count": {
+          "name": "quiz_version_question_count",
+          "value": "json_type(\"quiz_versions\".\"questions_json\") = 'array' AND json_array_length(\"quiz_versions\".\"questions_json\") BETWEEN 1 AND 500"
+        },
+        "quiz_version_snapshot_size": {
+          "name": "quiz_version_snapshot_size",
+          "value": "length(CAST(\"quiz_versions\".\"questions_json\" AS BLOB)) <= 1000000"
+        }
+      }
+    },
+    "responses": {
+      "name": "responses",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "attempt_id": {
+          "name": "attempt_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "question_id": {
+          "name": "question_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "study_set_id": {
+          "name": "study_set_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "selected_index": {
+          "name": "selected_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "is_correct": {
+          "name": "is_correct",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch())"
+        }
+      },
+      "indexes": {
+        "uq_responses_attempt_question": {
+          "name": "uq_responses_attempt_question",
+          "columns": [
+            "attempt_id",
+            "question_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "responses_attempt_id_study_set_id_quiz_attempts_id_study_set_id_fk": {
+          "name": "responses_attempt_id_study_set_id_quiz_attempts_id_study_set_id_fk",
+          "tableFrom": "responses",
+          "tableTo": "quiz_attempts",
+          "columnsFrom": [
+            "attempt_id",
+            "study_set_id"
+          ],
+          "columnsTo": [
+            "id",
+            "study_set_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "responses_question_id_study_set_id_questions_id_study_set_id_fk": {
+          "name": "responses_question_id_study_set_id_questions_id_study_set_id_fk",
+          "tableFrom": "responses",
+          "tableTo": "questions",
+          "columnsFrom": [
+            "question_id",
+            "study_set_id"
+          ],
+          "columnsTo": [
+            "id",
+            "study_set_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "responses_selected_index": {
+          "name": "responses_selected_index",
+          "value": "\"responses\".\"selected_index\" BETWEEN 0 AND 5"
+        },
+        "responses_correct_boolean": {
+          "name": "responses_correct_boolean",
+          "value": "\"responses\".\"is_correct\" IN (0, 1)"
+        }
+      }
+    },
+    "sources": {
+      "name": "sources",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "course_id": {
+          "name": "course_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "filename": {
+          "name": "filename",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "format": {
+          "name": "format",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "object_key": {
+          "name": "object_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "byte_size": {
+          "name": "byte_size",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "error_message": {
+          "name": "error_message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch())"
+        }
+      },
+      "indexes": {
+        "idx_sources_course": {
+          "name": "idx_sources_course",
+          "columns": [
+            "course_id"
+          ],
+          "isUnique": false
+        },
+        "uq_sources_object_key": {
+          "name": "uq_sources_object_key",
+          "columns": [
+            "object_key"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "sources_course_id_courses_id_fk": {
+          "name": "sources_course_id_courses_id_fk",
+          "tableFrom": "sources",
+          "tableTo": "courses",
+          "columnsFrom": [
+            "course_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "sources_size": {
+          "name": "sources_size",
+          "value": "\"sources\".\"byte_size\" BETWEEN 1 AND 10485760"
+        },
+        "sources_format": {
+          "name": "sources_format",
+          "value": "\"sources\".\"format\" IN ('pdf', 'pptx')"
+        },
+        "sources_status": {
+          "name": "sources_status",
+          "value": "\"sources\".\"status\" IN ('pending', 'processing', 'ready', 'failed')"
+        }
+      }
+    },
+    "study_sets": {
+      "name": "study_sets",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source_id": {
+          "name": "source_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "model": {
+          "name": "model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "prompt_version": {
+          "name": "prompt_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "request_key": {
+          "name": "request_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "error_message": {
+          "name": "error_message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch())"
+        }
+      },
+      "indexes": {
+        "idx_study_sets_source": {
+          "name": "idx_study_sets_source",
+          "columns": [
+            "source_id"
+          ],
+          "isUnique": false
+        },
+        "uq_study_sets_request": {
+          "name": "uq_study_sets_request",
+          "columns": [
+            "request_key"
+          ],
+          "isUnique": true
+        },
+        "uq_study_sets_id_source": {
+          "name": "uq_study_sets_id_source",
+          "columns": [
+            "id",
+            "source_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "study_sets_source_id_sources_id_fk": {
+          "name": "study_sets_source_id_sources_id_fk",
+          "tableFrom": "study_sets",
+          "tableTo": "sources",
+          "columnsFrom": [
+            "source_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "study_sets_kind": {
+          "name": "study_sets_kind",
+          "value": "\"study_sets\".\"kind\" IN ('quiz', 'flashcards')"
+        },
+        "study_sets_status": {
+          "name": "study_sets_status",
+          "value": "\"study_sets\".\"status\" IN ('pending', 'generating', 'ready', 'failed')"
+        }
+      }
+    },
+    "users": {
+      "name": "users",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}

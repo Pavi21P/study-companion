@@ -1,0 +1,10 @@
+import { cpSync, mkdirSync, readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { dirname, join } from 'node:path';
+const require = createRequire(import.meta.url);
+const root = dirname(require.resolve('pdfjs-dist/package.json'));
+const { version } = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
+const target = join('public', 'pdfjs', version);
+mkdirSync(target, { recursive: true });
+cpSync(join(root, 'build', 'pdf.worker.min.mjs'), join(target, 'pdf.worker.min.mjs'));
+for (const name of ['cmaps', 'standard_fonts', 'wasm']) cpSync(join(root, name), join(target, name), { recursive: true });
